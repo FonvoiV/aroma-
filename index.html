@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#800020">
+    <title>Калькулятор рецептур</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.png" type="image/png">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 15px;
+            background: #f9f2f4;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: linear-gradient(to right, #800020, #a00030);
+            color: #FFD700;
+            padding: 20px 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            border: 2px solid #FFD700;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin: 0;
+            color: #FFEC8B;
+        }
+        
+        .ingredient-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(128,0,32,0.2);
+            border: 1px solid #e0c0c0;
+        }
+        
+        input, select, button {
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 1px solid #d0a0a0;
+            border-radius: 8px;
+            outline: none;
+        }
+        
+        input {
+            flex: 1;
+            min-width: 120px;
+            background-color: #fffafa;
+        }
+        
+        input:focus {
+            border-color: #800020;
+            box-shadow: 0 0 0 2px rgba(128, 0, 32, 0.2);
+        }
+        
+        select {
+            flex: 0.5;
+            min-width: 100px;
+            background-color: #fffafa;
+        }
+        
+        button {
+            background: linear-gradient(to right, #800020, #a03050);
+            color: #FFD700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+            background: linear-gradient(to right, #900030, #b04060);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .add-btn {
+            flex: 0.3;
+            min-width: 80px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(to right, #800020, #a03050);
+        }
+        
+        .export-btn {
+            background: linear-gradient(to right, #a03050, #c05070);
+        }
+        
+        .results {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(128,0,32,0.2);
+            margin-top: 20px;
+            border: 1px solid #e0c0c0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e0c0c0;
+        }
+        
+        th {
+            background-color: #f8e8e8;
+            color: #800020;
+            font-weight: 600;
+        }
+        
+        .total-row {
+            font-weight: bold;
+            background-color: #f0e0e0;
+            color: #800020;
+        }
+        
+        .delete-btn {
+            background: linear-gradient(to right, #a00000, #c03030);
+            padding: 6px 14px;
+            font-size: 14px;
+            border-radius: 6px;
+            color: white;
+        }
+        
+        .install-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(to right, #800020, #a03050);
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 6px 15px rgba(128, 0, 32, 0.4);
+            display: none;
+            z-index: 100;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #a08080;
+        }
+        
+        @media (max-width: 600px) {
+            .ingredient-form {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            input, select, button {
+                width: 100%;
+            }
+            
+            header {
+                padding: 12px;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            header h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ИП Гарейшин</h1>
+            <h2>Калькулятор рецептур</h2>
+            <p>Профессиональный расчёт ароматических смесей</p>
+        </header>
+        
+        <div class="ingredient-form">
+            <input type="text" id="ingredientName" placeholder="Название ингредиента" required>
+            <input type="number" id="ingredientAmount" placeholder="Количество" min="0" step="0.0001" required>
+            <select id="ingredientUnit">
+                <option value="g">гр</option>
+                <option value="ml">мл</option>
+                <option value="mg">мг</option>
+                <option value="kg">кг</option>
+                <option value="l">л</option>
+            </select>
+            <button class="add-btn" onclick="addIngredient()">Добавить</button>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="action-btn calculate-btn" onclick="calculateRecipe()">Рассчитать рецептуру</button>
+            <button class="action-btn export-btn" id="exportBtn" onclick="exportRecipe()" disabled>Экспорт рецепта</button>
+        </div>
+        
+        <div class="results">
+            <h2 style="color: #800020; margin-top: 0; border-bottom: 2px solid #800020; padding-bottom: 10px;">Рецептура</h2>
+            <div id="totalResult"></div>
+            <table id="ingredientsTable">
+                <thead>
+                    <tr>
+                        <th>Ингредиент</th>
+                        <th>Количество</th>
+                        <th>%</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody id="ingredientsList">
+                    <tr>
+                        <td colspan="4" class="empty-state">Добавьте ингредиенты для расчёта</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <button id="installBtn" class="install-btn" title="Установить приложение">+</button>
+
+    <script>
+        // Хранение данных
+        let ingredients = [];
+        let currentTotal = 0;
+        
+        // Конвертация в граммы
+        function convertToGrams(amount, unit) {
+            switch(unit) {
+                case 'g': return amount;
+                case 'kg': return amount * 1000;
+                case 'mg': return amount / 1000;
+                case 'ml': return amount; // 1 мл ≈ 1 г для воды
+                case 'l': return amount * 1000;
+                default: return amount;
+            }
+        }
+        
+        // Добавление ингредиента
+        function addIngredient() {
+            const nameInput = document.getElementById('ingredientName');
+            const amountInput = document.getElementById('ingredientAmount');
+            const unitSelect = document.getElementById('ingredientUnit');
+            
+            const name = nameInput.value.trim();
+            const amount = parseFloat(amountInput.value);
+            const unit = unitSelect.value;
+            const unitText = unitSelect.options[unitSelect.selectedIndex].text;
+            
+            if (!name || isNaN(amount) || amount <= 0) {
+                alert('Пожалуйста, заполните все поля корректно');
+                return;
+            }
+            
+            const grams = convertToGrams(amount, unit);
+            
+            ingredients.push({
+                id: Date.now(),
+                name,
+                amount,
+                unit: unitText,
+                grams
+            });
+            
+            updateIngredientsList();
+            nameInput.value = '';
+            amountInput.value = '';
+            nameInput.focus();
+        }
+        
+        // Обновление списка ингредиентов
+        function updateIngredientsList() {
+            const list = document.getElementById('ingredientsList');
+            
+            if (ingredients.length === 0) {
+                list.innerHTML = '<tr><td colspan="4" class="empty-state">Добавьте ингредиенты для расчёта</td></tr>';
+                document.getElementById('exportBtn').disabled = true;
+                return;
+            }
+            
+            list.innerHTML = '';
+            
+            ingredients.forEach(ingredient => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ingredient.name}</td>
+                    <td>${ingredient.amount.toFixed(4)} ${ingredient.unit}</td>
+                    <td>-</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteIngredient(${ingredient.id})">Удалить</button>
+                    </td>
+                `;
+                list.appendChild(row);
+            });
+        }
+        
+        // Удаление ингредиента
+        function deleteIngredient(id) {
+            ingredients = ingredients.filter(ing => ing.id !== id);
+            updateIngredientsList();
+        }
+        
+        // Расчет рецептуры
+        function calculateRecipe() {
+            if (ingredients.length === 0) {
+                alert('Добавьте хотя бы один ингредиент');
+                return;
+            }
+            
+            currentTotal = ingredients.reduce((sum, ing) => sum + ing.grams, 0);
+            const results = document.getElementById('ingredientsList');
+            results.innerHTML = '';
+            
+            ingredients.forEach(ingredient => {
+                const percentage = (ingredient.grams / currentTotal) * 100;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ingredient.name}</td>
+                    <td>${ingredient.amount.toFixed(4)} ${ingredient.unit}</td>
+                    <td>${percentage.toFixed(4)}%</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteIngredient(${ingredient.id})">Удалить</button>
+                    </td>
+                `;
+                results.appendChild(row);
+            });
+            
+            // Добавляем строку с итогом
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'total-row';
+            totalRow.innerHTML = `
+                <td><strong>ИТОГО:</strong></td>
+                <td><strong>${currentTotal.toFixed(4)} г</strong></td>
+                <td><strong>100%</strong></td>
+                <td></td>
+            `;
+            results.appendChild(totalRow);
+            
+            document.getElementById('totalResult').innerHTML = `
+                <div style="background: #f8e8e8; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #e0c0c0;">
+                    <strong>Общая масса смеси:</strong> ${currentTotal.toFixed(4)} грамм
+                </div>
+            `;
+            
+            document.getElementById('exportBtn').disabled = false;
+        }
+        
+        // Экспорт рецепта в текстовый файл
+        function exportRecipe() {
+            if (ingredients.length === 0 || currentTotal === 0) {
+                alert('Сначала рассчитайте рецептуру');
+                return;
+            }
+            
+            let recipeText = `Рецептура ароматической смеси\n`;
+            recipeText += `Дата создания: ${new Date().toLocaleString()}\n\n`;
+            recipeText += `ИП Гарейшин\n`;
+            recipeText += `Калькулятор рецептур\n\n`;
+            recipeText += 'ИНГРЕДИЕНТЫ:\n';
+            recipeText += '========================================\n';
+            
+            ingredients.forEach(ingredient => {
+                const percentage = (ingredient.grams / currentTotal) * 100;
+                recipeText += `${ingredient.name}: ${ingredient.amount.toFixed(4)} ${ingredient.unit} (${percentage.toFixed(4)}%)\n`;
+            });
+            
+            recipeText += '========================================\n';
+            recipeText += `ИТОГО: ${currentTotal.toFixed(4)} грамм\n\n`;
+            recipeText += 'Примечания:\n';
+            recipeText += '========================================\n';
+            recipeText += 'Технолог: _________________________\n';
+            recipeText += 'Дата производства: ________________\n';
+            recipeText += 'Партия №: _________________________\n';
+            recipeText += '\n';
+            recipeText += 'ИП Гарейшин\n';
+            recipeText += 'Тел.: _____________________________\n';
+            
+            const blob = new Blob([recipeText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `рецептура_${new Date().toISOString().slice(0, 10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // PWA Установка
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+        
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+        
+        // Проверка совместимости Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker зарегистрирован');
+                    }).catch(err => {
+                        console.log('Ошибка регистрации ServiceWorker:', err);
+                    });
+            });
+        }
+        
+        // Сохранение данных при перезагрузке
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('ingredients', JSON.stringify(ingredients));
+            localStorage.setItem('currentTotal', currentTotal.toString());
+        });
+        
+        // Восстановление данных при загрузке
+        window.addEventListener('load', () => {
+            const savedIngredients = localStorage.getItem('ingredients');
+            const savedTotal = localStorage.getItem('currentTotal');
+            
+            if (savedIngredients) {
+                ingredients = JSON.parse(savedIngredients);
+                updateIngredientsList();
+            }
+            
+            if (savedTotal) {
+                currentTotal = parseFloat(savedTotal);
+                if (ingredients.length > 0) {
+                    document.getElementById('exportBtn').disabled = false;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
